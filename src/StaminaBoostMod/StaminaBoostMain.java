@@ -1,33 +1,32 @@
 package StaminaBoostMod;
 
 import arc.*;
+import arc.graphics.Color;
+import arc.scene.ui.layout.Table;
 import arc.util.*;
+import mindustry.Vars;
 import mindustry.game.EventType.*;
 import mindustry.mod.*;
-import mindustry.ui.dialogs.*;
+import mindustry.ui.Bar;
 
-public class StaminaBoostMain extends Mod{
+public class StaminaBoostMain extends Mod {
 
+    public static float staminaLeft = 1.0f;
     public StaminaBoostMain(){
         Log.info("Loaded StaminaBoostMain constructor.");
 
-        //listen for game load event
         Events.on(ClientLoadEvent.class, e -> {
-            //show dialog upon startup
-            Time.runTask(10f, () -> {
-                BaseDialog dialog = new BaseDialog("frog");
-                dialog.cont.add("behold").row();
-                //mod sprites are prefixed with the mod name (this mod is called 'example-java-mod' in its config)
-                dialog.cont.image(Core.atlas.find("example-java-mod-frog")).pad(20f).row();
-                dialog.cont.button("I see", dialog::hide).size(100f, 50f);
-                dialog.show();
-            });
+            Table myTable = new Table();
+            myTable.bottom();
+            myTable.setFillParent(true);
+            Bar staminaBar = new Bar("Stamina", Color.orange, () -> staminaLeft);
+            myTable.add(staminaBar).width(200f).height(25f).padBottom(60f);
+            myTable.visible(() -> Vars.ui.hudfrag.shown);
+            Vars.ui.hudGroup.addChild(myTable);
         });
     }
-
     @Override
     public void loadContent(){
-        Log.info("Loading some example content.");
+        Log.info("Loading content.");
     }
-
 }
