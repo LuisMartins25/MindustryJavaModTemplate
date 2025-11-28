@@ -5,24 +5,29 @@ import mindustry.content.Fx;
 import mindustry.type.StatusEffect;
 
 public class ModStatusEffects {
-    // Definimos como public static para acessar de qualquer lugar
-    public static StatusEffect sprint, tired;
+    public static StatusEffect sprint;
+    public static StatusEffect  tired;
+    public static StatusEffect berserk;
 
     public static void load() {
-        // Definição do efeito de corrida
+
         sprint = new StatusEffect("sprint-buff") {{
             speedMultiplier = 1.5f;
-            color = Color.valueOf("76ff03");
+            color = Color.valueOf("67ea00");
             effect = Fx.spawnShockwave;
-            show = false;
         }};
-
-        // Definição do efeito de cansaço
         tired = new StatusEffect("tired-debuff") {{
-            speedMultiplier = 0.5f;
+            speedMultiplier = 0.4f;
             effect = Fx.smoke;
-            color = Color.red;
+            color = Color.black;
             show = true;
+        }};
+        berserk = new StatusEffect("berserk_mode") {{
+            reloadMultiplier = 2f;
+            damageMultiplier = 1.5f;
+            speedMultiplier = 0.9f;
+            color = Color.red;
+            effect = Fx.overdriven;
         }};
     }
 }
