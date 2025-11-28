@@ -56,7 +56,7 @@ public class StaminaBoostMain extends Mod {
         boolean isMousePressed = Core.input.keyDown(KeyCode.mouseLeft);
         float delta = Time.delta / 60f;
 
-        if(isShiftPressed && isMousePressed){
+        if(isShiftPressed && !isMousePressed){
             staminaDec(delta);
             unit.speedMultiplier = SPEED_INCREASE_RATE;
             if(staminaLeft <= 0.3){
