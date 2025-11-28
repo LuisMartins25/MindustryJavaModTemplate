@@ -16,9 +16,6 @@ import mindustry.ui.Bar;
 public class StaminaBoostMain extends Mod {
     private static final float STAMINA_DECREASE_RATE = 0.05f;
     private static final float STAMINA_RECOVERY_RATE = 0.01f;
-    private static final float SPEED_INCREASE_RATE = 1.5f;
-    private static final float SPEED_DECREASE_RATE = 0.5f;
-    private static final float DEFAULT_SPEED = 1f; // TO CHECK the dafault speed in game
 
     public static float staminaLeft = 1.0f;
     private static boolean lowStamina = false;
@@ -30,13 +27,27 @@ public class StaminaBoostMain extends Mod {
             Table myTable = new Table();
             myTable.bottom();
             myTable.setFillParent(true);
-            Bar staminaBar = new Bar(() -> "Stamina", () -> blinkColor(), () -> staminaLeft);
+
+            Bar staminaBar = new Bar(
+                    () -> lowStamina ? "OverCharge" : "Stamina",
+                    () -> blinkColor(),
+                    () -> staminaLeft
+            );
+
             myTable.add(staminaBar).width(200f).height(25f).padBottom(60f);
             myTable.visible(() -> Vars.ui.hudfrag.shown);
             Vars.ui.hudGroup.addChild(myTable);
 
             Events.run(EventType.Trigger.update, () -> update());
         });
+    }
+
+
+    @Override
+    public void loadContent(){
+        // Isto é obrigatório para o jogo reconhecer os teus efeitos novos
+        ModStatusEffects.load();
+        Log.info("Loaded Effects constructor.");
     }
 
     private Color blinkColor(){
@@ -58,23 +69,23 @@ public class StaminaBoostMain extends Mod {
 
         if(isShiftPressed && !isMousePressed){
             staminaDec(delta);
-            unit.speedMultiplier = SPEED_INCREASE_RATE;
-            if(staminaLeft <= 0.3){
-                unit.speedMultiplier = SPEED_INCREASE_RATE * SPEED_DECREASE_RATE;
+            if(!lowStamina){
+                unit.apply(ModStatusEffects.sprint, 10f);
+            }
+            if(staminaLeft <= 0.01f){
                 lowStamina = true;
             }
         }
         else{
             staminaInc(delta);
-            unit.speedMultiplier = DEFAULT_SPEED;
+        }
+        if(lowStamina){
+            unit.apply(ModStatusEffects.tired, 10f);
         }
     }
     private void staminaInc(float delta){
         float stamina = staminaLeft + STAMINA_RECOVERY_RATE * delta;
-        if(stamina >= 1.0f)
-            staminaLeft = 1.0f;
-        else
-            staminaLeft = stamina;
+        staminaLeft = Math.min(stamina, 1.0f);
 
         if(staminaLeft > 0.3f)
             lowStamina = false;
@@ -82,13 +93,6 @@ public class StaminaBoostMain extends Mod {
 
     private void staminaDec(float delta){
         float stamina = staminaLeft - STAMINA_DECREASE_RATE * delta;
-        if(stamina <= 0.0f)
-            staminaLeft = 0.0f;
-        else
-            staminaLeft = stamina;
-    }
-    @Override
-    public void loadContent(){
-        Log.info("Loading content.");
+        staminaLeft = Math.max(stamina, 0.0f);
     }
 }
